@@ -1,19 +1,19 @@
 <template>
-  <v-card class="mx-auto wrapper" max-width="1200">
+  <v-app>
     <v-data-table
       :headers="headers"
       :items="desserts"
       sort-by="calories"
-      class="elevation-1 "
+      class="elevation-1"
     >
       <template v-slot:top>
-        <v-toolbar>
+        <v-toolbar flat>
           <v-toolbar-title>My CRUD</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
-              <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on"
+              <v-btn color="dark" dark class="mb-2" v-bind="attrs" v-on="on"
                 >New Item</v-btn
               >
             </template>
@@ -80,7 +80,7 @@
         <v-btn color="primary" @click="initialize">Reset</v-btn>
       </template>
     </v-data-table>
-  </v-card>
+  </v-app>
 </template>
 
 <script>
@@ -94,13 +94,11 @@ export default {
         sortable: false,
         value: "name"
       },
-      { text: "Dev rate", value: "calories" },
-      { text: "Customer rate", value: "fat" },
-      { text: "Hours (g)", value: "carbs" },
-      { text: "Fees", value: "protein" },
-      { text: "Profit per hour", value: "protein", sortable: false },
-      { text: "Profit per period", value: "protein", sortable: false },
-      { text: "Dev payment", value: "protein", sortable: false }
+      { text: "Calories", value: "calories" },
+      { text: "Fat (g)", value: "fat" },
+      { text: "Carbs (g)", value: "carbs" },
+      { text: "Protein (g)", value: "protein" },
+      { text: "Actions", value: "actions", sortable: false }
     ],
     desserts: [],
     editedIndex: -1,
@@ -243,8 +241,3 @@ export default {
   }
 };
 </script>
-<style lang="scss">
-.wrapper {
-  margin: auto;
-}
-</style>
