@@ -22,13 +22,12 @@
     </v-navigation-drawer>
 
     <v-app-bar app dark>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Project 1</v-toolbar-title>
     </v-app-bar>
 
     <v-main>
       <v-container class="fill-height" fluid>
-        <ProjectSpace class="projectSpace" />
+        <ProjectSpace class="projectSpace" v-bind:changeDrawer="changeDrawer" />
       </v-container>
     </v-main>
     <v-footer app dark>
@@ -47,8 +46,13 @@ export default {
     source: String
   },
   data: () => ({
-    drawer: null
-  })
+    drawer: false
+  }),
+  methods: {
+    changeDrawer() {
+      this.drawer = !this.drawer;
+    }
+  }
 };
 </script>
 
@@ -56,4 +60,7 @@ export default {
 .projectSpace {
   width: 100%;
 }
+/* .contain {
+  padding: 0;
+} */
 </style>

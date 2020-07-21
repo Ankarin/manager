@@ -7,7 +7,8 @@
       class="elevation-1"
     >
       <template v-slot:top>
-        <v-toolbar flat dark>
+        <v-app-bar app flat dark>
+          <v-app-bar-nav-icon @click.stop="changeDrawer"></v-app-bar-nav-icon>
           <v-toolbar-title>Project 1</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
@@ -102,7 +103,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </v-toolbar>
+        </v-app-bar>
       </template>
       <template v-slot:item.actions="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
@@ -121,6 +122,7 @@
 
 <script>
 export default {
+  props: ["changeDrawer"],
   data: () => ({
     dialog: false,
     kek: 15,
