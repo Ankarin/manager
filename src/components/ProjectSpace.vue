@@ -9,7 +9,7 @@
       <template v-slot:top>
         <v-app-bar app flat dark>
           <v-app-bar-nav-icon @click.stop="changeDrawer"></v-app-bar-nav-icon>
-          <v-toolbar-title>Project 1</v-toolbar-title>
+          <v-toolbar-title>{{ project }}</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
@@ -28,72 +28,70 @@
               </v-card-title>
 
               <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.name"
-                        label="Name"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.time"
-                        label="Time"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.companyRate"
-                        label="Company rate"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        :disabled="editedItem.isEmpFixedPayment"
-                        v-model="editedItem.devRate"
-                        value="0"
-                        label="Dev rate"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.fee"
-                        label="Fee %"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-if="!editedItem.isEmpFixedPayment"
-                        disabled
-                        :value="calcDevPayout.toFixed(2)"
-                        label="Dev payout"
-                      ></v-text-field>
-                      <v-text-field
-                        v-if="editedItem.isEmpFixedPayment"
-                        v-model="editedItem.devPayout"
-                        label="Dev payout"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        disabled
-                        :value="calcMarginPerH.toFixed(2)"
-                        label="Margin per hour"
-                      ></v-text-field>
-                    </v-col>
+                <v-row>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      v-model="editedItem.name"
+                      label="Name"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      v-model="editedItem.time"
+                      label="Time"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      v-model="editedItem.companyRate"
+                      label="Company rate"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      :disabled="editedItem.isEmpFixedPayment"
+                      v-model="editedItem.devRate"
+                      value="0"
+                      label="Dev rate"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      v-model="editedItem.fee"
+                      label="Fee %"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      v-if="!editedItem.isEmpFixedPayment"
+                      disabled
+                      :value="calcDevPayout.toFixed(2)"
+                      label="Dev payout"
+                    ></v-text-field>
+                    <v-text-field
+                      v-if="editedItem.isEmpFixedPayment"
+                      v-model="editedItem.devPayout"
+                      label="Dev payout"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      disabled
+                      :value="calcMarginPerH.toFixed(2)"
+                      label="Margin per hour"
+                    ></v-text-field>
+                  </v-col>
 
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        disabled
-                        :value="calcMargin.toFixed(2)"
-                        label="Margin"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-container>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      disabled
+                      :value="calcMargin.toFixed(2)"
+                      label="Margin"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
               </v-card-text>
 
               <v-card-actions>
@@ -122,8 +120,26 @@
 
 <script>
 export default {
-  props: ["changeDrawer"],
+  props: ["changeDrawer", "project", "user"],
   data: () => ({
+    currentProject: {
+      key: "150321",
+      name: "Project 1",
+      devs: [
+        {
+          name: "Nasya Pisya",
+          time: 13.5,
+          companyRate: 25,
+          devRate: 15,
+          fee: 5,
+          marginPerH: 5,
+          devPayout: 0,
+          margin: 0,
+          eployeeFixedPayment: 0,
+          isEmpFixedPayment: false
+        }
+      ]
+    },
     dialog: false,
     kek: 15,
     headers: [
