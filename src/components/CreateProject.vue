@@ -2,7 +2,15 @@
   <div>
     <v-dialog v-model="dialog" max-width="500px">
       <template v-slot:activator="{ on, attrs }">
-        <v-btn dark class="mb-2 createBtn" v-bind="attrs" v-on="on"
+        <v-btn
+          color="primary"
+          v-if="!isProjectSpace"
+          class="mb-2 createBtn"
+          v-bind="attrs"
+          v-on="on"
+          >New project</v-btn
+        >
+        <v-btn color="primary" v-else class="mb-2 " v-bind="attrs" v-on="on"
           >New project</v-btn
         >
       </template>
@@ -18,7 +26,11 @@
         <v-card-text>
           <!-- <v-row> -->
           <!-- <v-col cols="12" sm="6" md="4"> -->
-          <v-text-field v-model="project.name" label="Name"></v-text-field>
+          <v-text-field
+            v-model="project.name"
+            :rules="[rules.required, rules.counter, rules.exist]"
+            label="Name"
+          ></v-text-field>
           <!-- </v-col> -->
           <!-- </v-row> -->
         </v-card-text>
@@ -26,7 +38,13 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <!-- <v-btn color="blue darken-1" text @click="close">Cancel</v-btn> -->
-          <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+          <v-btn
+            color="blue darken-1"
+            :disabled="!isName || !isExist"
+            text
+            @click="save"
+            >Save</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -35,20 +53,44 @@
 
 <script>
 export default {
-  props: ["createProject"],
+  props: ["createProject", "isProjectSpace", "projects"],
   data() {
     return {
       dialog: false,
       project: {
         name: ""
+      },
+      rules: {
+        required: value => !!value || "Required.",
+        counter: value => value.length <= 20 || "Max 20 characters",
+        exist: () => this.isEx() || "Project with this name already exists"
       }
     };
   },
+  computed: {
+    isName: function() {
+      if (this.project.name) {
+        return true;
+      } else return false;
+    },
+    isExist: function() {
+      if (this.projects.filter(item => item == this.project.name).length == 0)
+        return true;
+      else return false;
+    }
+  },
   methods: {
-    save() {
-      this.dialog = false;
-      this.createProject(this.project.name);
-      this.project.name = "";
+    isEx: function() {
+      if (this.projects.filter(item => item == this.project.name).length == 0)
+        return true;
+      else return false;
+    },
+    save: async function() {
+      const res = await this.createProject(this.project.name);
+      if (res == "ok") {
+        this.dialog = false;
+        this.project.name = "";
+      }
     }
   }
 };

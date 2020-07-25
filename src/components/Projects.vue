@@ -6,14 +6,29 @@
           <v-icon>mdi-account</v-icon>
         </v-list-item-action>
         <v-list-item-content>
-          <v-list-item-title> Dmitry Loza</v-list-item-title>
+          <v-list-item-title>{{ user.email }}</v-list-item-title>
         </v-list-item-content>
-        <v-icon class="cog-icon">mdi-cog</v-icon>
+        <v-menu offset-y>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon class="cog-icon" v-bind="attrs" v-on="on">mdi-cog</v-icon>
+          </template>
+          <v-list>
+            <v-list-item class="menu-item">
+              <v-list-item-title link @click="signOut"
+                >Log Out</v-list-item-title
+              >
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </v-list-item>
       <v-divider horisontal></v-divider>
       <br />
       <v-list-item>
-        <CreateProject class="createProject" :createProject="createProject" />
+        <CreateProject
+          :projects="projects"
+          class="createProject"
+          :createProject="createProject"
+        />
       </v-list-item>
 
       <v-list-item
@@ -52,17 +67,11 @@ export default {
   components: {
     CreateProject
   },
-  props: ["changeProject"],
+  props: ["changeProject", "user", "createProject", "projects", "signOut"],
   data() {
-    return {
-      projects: ["Project 1", "Project 2"]
-    };
+    return {};
   },
-  methods: {
-    createProject(project) {
-      this.projects.push(project);
-    }
-  }
+  methods: {}
 };
 </script>
 
@@ -71,6 +80,9 @@ export default {
   width: 100%;
 }
 .cog-icon:hover {
+  cursor: pointer;
+}
+.menu-item {
   cursor: pointer;
 }
 </style>

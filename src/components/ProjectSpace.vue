@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-data-table
+      hide-default-footer
       :headers="headers"
       :items="devs"
       sort-by="calories"
@@ -14,7 +15,7 @@
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
-              <v-btn dark class="mb-2" v-bind="attrs" v-on="on"
+              <v-btn color="primary" class="mb-2" v-bind="attrs" v-on="on"
                 >New Developer</v-btn
               >
             </template>
@@ -111,35 +112,27 @@
           mdi-delete
         </v-icon>
       </template>
-      <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize">Reset</v-btn>
+      <template v-if="!project">
+        <br />
+        <CreateProject
+          :projects="projects"
+          :isProjectSpace="true"
+          :createProject="createProject"
+        />
       </template>
     </v-data-table>
   </v-app>
 </template>
 
 <script>
+import CreateProject from "./CreateProject.vue";
 export default {
-  props: ["changeDrawer", "project", "user"],
+  components: {
+    CreateProject
+  },
+  props: ["changeDrawer", "project", "user", "createProject", "projects"],
   data: () => ({
-    currentProject: {
-      key: "150321",
-      name: "Project 1",
-      devs: [
-        {
-          name: "Nasya Pisya",
-          time: 13.5,
-          companyRate: 25,
-          devRate: 15,
-          fee: 5,
-          marginPerH: 5,
-          devPayout: 0,
-          margin: 0,
-          eployeeFixedPayment: 0,
-          isEmpFixedPayment: false
-        }
-      ]
-    },
+    name: "",
     dialog: false,
     kek: 15,
     headers: [
@@ -158,20 +151,7 @@ export default {
       { text: "Margin", align: "start", value: "margin" },
       { text: "Actions", align: "start", value: "actions", sortable: false }
     ],
-    devs: [
-      {
-        name: "Nasya Pisya",
-        time: 13.5,
-        companyRate: 25,
-        devRate: 15,
-        fee: 5,
-        marginPerH: 5,
-        devPayout: 0,
-        margin: 0,
-        eployeeFixedPayment: 0,
-        isEmpFixedPayment: false
-      }
-    ],
+    devs: [],
     editedIndex: -1,
     editedItem: {
       name: "",
@@ -234,6 +214,8 @@ export default {
 
   created() {
     this.initialize();
+    this.name = this.project.name;
+    this.devs = this.project.devs;
   },
 
   methods: {

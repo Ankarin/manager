@@ -11,16 +11,23 @@
       </v-card>
     </v-dialog>
     <v-navigation-drawer v-model="drawer" dark app>
-      <v-btn @click="signOut">Log out</v-btn>
-      <v-btn dark class="signInButton" @click="signIn">Sign In</v-btn>
-      <Projects :changeProject="changeProject" />
+      <!-- <v-btn @click="signOut">Log out</v-btn> -->
+      <Projects
+        :signOut="signOut"
+        :user="user"
+        :changeProject="changeProject"
+        :createProject="createProject"
+        :projects="projects"
+      />
     </v-navigation-drawer>
 
     <v-main>
       <v-container class="fill-height" fluid>
         <ProjectSpace
+          :createProject="createProject"
           class="projectSpace"
           :changeDrawer="changeDrawer"
+          :projects="projects"
           :project="project"
           :user="user"
         />
@@ -35,6 +42,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 import firebase from "./firebase";
+const db = firebase.firestore();
 var provider = new firebase.auth.GoogleAuthProvider();
 import Projects from "./components/Projects.vue";
 import ProjectSpace from "./components/ProjectSpace.vue";
@@ -48,23 +56,65 @@ export default {
     source: String
   },
   data: () => ({
+    projects: [],
     drawer: false,
     project: "Project 1",
     user: "",
     dialog: false,
     check: "1",
-    loggedIn: false
+    loggedIn: false,
+    userData: "12"
   }),
   mounted() {
     this.setupFirebase();
   },
 
   methods: {
+    log() {
+      console.log(this.projects);
+    },
+    getUserData: async function() {
+      try {
+        let ref = await db.collection("users").doc(this.user.email);
+        ref.get().then(doc => {
+          if (doc.exists) {
+            this.projects = doc.data().projects;
+          } else {
+            // doc.data() will be undefined in this case
+            console.log("No such document!");
+          }
+        });
+      } catch (error) {
+        console.log("Error getting document:", error);
+      }
+    },
+    createProject: async function(project) {
+      const isExist = this.projects.filter(item => item == project).length;
+      console.log(isExist);
+      if (isExist > 0) {
+        return;
+      } else {
+        this.projects.push(project);
+        try {
+          await db
+            .collection("users")
+            .doc(this.user.email)
+            .update({
+              projects: this.projects
+            });
+          return "ok";
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    },
+    createUser(displayName, email) {},
     setupFirebase() {
       firebase.auth().onAuthStateChanged(user => {
         if (user) {
           this.dialog = false;
           this.user = user;
+          this.getUserData();
         } else {
           this.user = "";
           this.dialog = true;
@@ -84,6 +134,17 @@ export default {
         .then(function(result) {
           // This gives you a Google Access Token. You can use it to access the Google API.
           var token = result.credential.accessToken;
+          console.log(result);
+          db.collection("users")
+            .doc(result.user.email)
+            .get()
+            .then(function(doc) {
+              if (!doc.exists) {
+                db.collection("users")
+                  .doc(result.user.email)
+                  .set({ name: result.user.displayName });
+              }
+            });
         })
         .catch(function(error) {
           console.log(error);
