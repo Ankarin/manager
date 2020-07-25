@@ -131,28 +131,11 @@ export default {
     changeProject(project) {
       this.project = project;
     },
-    editProject(devs, name, edited, editedIndex) {
+    editProject(devs, name) {
       let indexOfProject = this.projects.findIndex(
         element => element.name == name
       );
       this.projects[indexOfProject].devs = devs;
-
-      if (editedIndex) {
-        Object.assign(
-          this.projects[indexOfProject].devs[this.editedIndex],
-          edited
-        );
-      } else {
-        try {
-          let newArr = this.projects[indexOfProject].devs;
-          console.log(newArr);
-          newArr.push(edited);
-          this.projects[indexOfProject].devs = newArr;
-        } catch (err) {
-          console.log(err);
-        }
-      }
-
       db.collection("users")
         .doc(this.user.email)
         .update({

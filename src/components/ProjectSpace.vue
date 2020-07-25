@@ -1,9 +1,10 @@
 <template>
   <v-app>
     <v-data-table
+      v-if="project"
       hide-default-footer
       :headers="headers"
-      :items="project.devs"
+      :items="devs"
       sort-by="calories"
       class="elevation-1"
     >
@@ -214,6 +215,10 @@ export default {
   },
 
   watch: {
+    project() {
+      this.devs = this.project.devs;
+      this.name = this.project.name;
+    },
     dialog(val) {
       val || this.close();
     }
@@ -221,15 +226,13 @@ export default {
 
   created() {
     this.initialize();
-    this.name = this.project.name;
-    this.devs = this.project.devs;
   },
 
   methods: {
     initialize() {},
 
     editItem(item) {
-      this.editedIndex = this.project.devs.indexOf(item);
+      this.editedIndex = this.devs.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
@@ -260,15 +263,11 @@ export default {
         edited.devRate = 0;
       }
       if (this.editedIndex > -1) {
-        this.editProject(
-          this.devs,
-          this.project.name,
-          edited,
-          this.editedIndex
-        );
+        Object.assign(this.devs[this.editedIndex], edited);
       } else {
-        this.editProject(this.devs, this.project.name, edited);
+        this.devs.push(edited);
       }
+      this.editProject(this.devs, this.project.name);
       this.close();
     }
   }
