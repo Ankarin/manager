@@ -34,14 +34,14 @@
       <v-list-item
         link
         v-for="project in projects"
-        :key="project"
+        :key="project.name"
         @click="changeProject(project)"
       >
         <v-list-item-action>
           <v-icon></v-icon>
         </v-list-item-action>
         <v-list-item-content>
-          <v-list-item-title v-text="project"></v-list-item-title>
+          <v-list-item-title>{{ project.name }}</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
       <!-- <v-expansion-panel>

@@ -3,14 +3,14 @@
     <v-data-table
       hide-default-footer
       :headers="headers"
-      :items="devs"
+      :items="project.devs"
       sort-by="calories"
       class="elevation-1"
     >
       <template v-slot:top>
         <v-app-bar app flat dark>
           <v-app-bar-nav-icon @click.stop="changeDrawer"></v-app-bar-nav-icon>
-          <v-toolbar-title>{{ project }}</v-toolbar-title>
+          <v-toolbar-title>{{ project.name }}</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
@@ -130,7 +130,14 @@ export default {
   components: {
     CreateProject
   },
-  props: ["changeDrawer", "project", "user", "createProject", "projects"],
+  props: [
+    "changeDrawer",
+    "project",
+    "user",
+    "createProject",
+    "projects",
+    "editProject"
+  ],
   data: () => ({
     name: "",
     dialog: false,
@@ -222,7 +229,7 @@ export default {
     initialize() {},
 
     editItem(item) {
-      this.editedIndex = this.devs.indexOf(item);
+      this.editedIndex = this.project.devs.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
@@ -253,9 +260,14 @@ export default {
         edited.devRate = 0;
       }
       if (this.editedIndex > -1) {
-        Object.assign(this.devs[this.editedIndex], edited);
+        this.editProject(
+          this.devs,
+          this.project.name,
+          edited,
+          this.editedIndex
+        );
       } else {
-        this.devs.push(edited);
+        this.editProject(this.devs, this.project.name, edited);
       }
       this.close();
     }

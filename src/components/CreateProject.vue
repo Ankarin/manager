@@ -74,19 +74,23 @@ export default {
       } else return false;
     },
     isExist: function() {
-      if (this.projects.filter(item => item == this.project.name).length == 0)
+      if (
+        this.projects.filter(item => item.name == this.project.name).length == 0
+      )
         return true;
       else return false;
     }
   },
   methods: {
     isEx: function() {
-      if (this.projects.filter(item => item == this.project.name).length == 0)
+      if (
+        this.projects.filter(item => item.name == this.project.name).length == 0
+      )
         return true;
       else return false;
     },
     save: async function() {
-      const res = await this.createProject(this.project.name);
+      const res = await this.createProject(this.project);
       if (res == "ok") {
         this.dialog = false;
         this.project.name = "";

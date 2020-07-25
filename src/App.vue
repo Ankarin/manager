@@ -24,6 +24,7 @@
     <v-main>
       <v-container class="fill-height" fluid>
         <ProjectSpace
+          :editProject="editProject"
           :createProject="createProject"
           class="projectSpace"
           :changeDrawer="changeDrawer"
@@ -58,7 +59,7 @@ export default {
   data: () => ({
     projects: [],
     drawer: false,
-    project: "Project 1",
+    project: {},
     user: "",
     dialog: false,
     check: "1",
@@ -78,7 +79,7 @@ export default {
         let ref = await db.collection("users").doc(this.user.email);
         ref.get().then(doc => {
           if (doc.exists) {
-            this.projects = doc.data().projects;
+            if (doc.data().projects) this.projects = doc.data().projects;
           } else {
             // doc.data() will be undefined in this case
             console.log("No such document!");
@@ -89,18 +90,21 @@ export default {
       }
     },
     createProject: async function(project) {
-      const isExist = this.projects.filter(item => item == project).length;
-      console.log(isExist);
+      const isExist = this.projects.filter(item => item.name == project.name)
+        .length;
       if (isExist > 0) {
         return;
       } else {
-        this.projects.push(project);
+        let newProject = { name: project.name };
+        this.projects.push(newProject);
+
         try {
           await db
             .collection("users")
             .doc(this.user.email)
             .update({
-              projects: this.projects
+              projects: this.projects,
+              devs: []
             });
           return "ok";
         } catch (err) {
@@ -117,7 +121,7 @@ export default {
           this.getUserData();
         } else {
           this.user = "";
-          this.dialog = true;
+          (this.projects = []), (this.dialog = true);
         }
       });
     },
@@ -126,6 +130,34 @@ export default {
     },
     changeProject(project) {
       this.project = project;
+    },
+    editProject(devs, name, edited, editedIndex) {
+      let indexOfProject = this.projects.findIndex(
+        element => element.name == name
+      );
+      this.projects[indexOfProject].devs = devs;
+
+      if (editedIndex) {
+        Object.assign(
+          this.projects[indexOfProject].devs[this.editedIndex],
+          edited
+        );
+      } else {
+        try {
+          let newArr = this.projects[indexOfProject].devs;
+          console.log(newArr);
+          newArr.push(edited);
+          this.projects[indexOfProject].devs = newArr;
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      db.collection("users")
+        .doc(this.user.email)
+        .update({
+          projects: this.projects
+        });
     },
     signIn() {
       firebase
