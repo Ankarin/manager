@@ -1,7 +1,14 @@
 <template>
   <v-app>
+    <div class="paggination" v-if="project.name">
+      <v-pagination
+        v-model="page"
+        :length="20"
+        :total-visible="10"
+      ></v-pagination>
+      <AddPeriod :devs="devs" />
+    </div>
     <v-data-table
-      v-if="project"
       hide-default-footer
       :headers="headers"
       :items="devs"
@@ -11,10 +18,11 @@
       <template v-slot:top>
         <v-app-bar app flat dark>
           <v-app-bar-nav-icon @click.stop="changeDrawer"></v-app-bar-nav-icon>
+
           <v-toolbar-title>{{ project.name }}</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
-          <v-dialog v-model="dialog" max-width="500px">
+          <v-dialog v-if="createBtn" v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" class="mb-2" v-bind="attrs" v-on="on"
                 >New Developer</v-btn
@@ -37,10 +45,17 @@
                       label="Name"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="12" sm="6" md="4">
+                  <v-col cols="12" sm="6" md="4" class="time">
                     <v-text-field
-                      v-model="editedItem.time"
-                      label="Time"
+                      v-model="editedItem.hours"
+                      label="Hours"
+                      type="number"
+                    ></v-text-field>
+                    <v-text-field
+                      v-model="editedItem.minutes"
+                      label="Minutes"
+                      type="number"
+                      max="60"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
@@ -122,14 +137,18 @@
         />
       </template>
     </v-data-table>
+
+    <!-- <v-pagination v-model="page" :length="periodsLength"></v-pagination> -->
   </v-app>
 </template>
 
 <script>
 import CreateProject from "./CreateProject.vue";
+import AddPeriod from "./AddPeriod.vue";
 export default {
   components: {
-    CreateProject
+    CreateProject,
+    AddPeriod
   },
   props: [
     "changeDrawer",
@@ -140,6 +159,8 @@ export default {
     "editProject"
   ],
   data: () => ({
+    currentPeriod: 0,
+    page: 1,
     name: "",
     dialog: false,
     kek: 15,
@@ -163,7 +184,8 @@ export default {
     editedIndex: -1,
     editedItem: {
       name: "",
-      time: 0,
+      hours: 0,
+      minutes: 0,
       companyRate: 0,
       devRate: 0,
       fee: 0,
@@ -174,7 +196,8 @@ export default {
     },
     defaultItem: {
       name: "",
-      time: 0,
+      hours: 0,
+      minutes: 0,
       companyRate: 0,
       devRate: 0,
       fee: 0,
@@ -186,37 +209,54 @@ export default {
   }),
 
   computed: {
+    periodsLength() {
+      return this.project.periods.length;
+    },
+    createBtn() {
+      if (this.project.name) {
+        return true;
+      } else return false;
+    },
+    timeCalc() {
+      let time =
+        Number(this.editedItem.hours) +
+        Number(((100 / 60) * this.editedItem.minutes) / 100);
+      return time;
+    },
     formTitle() {
       return this.editedIndex === -1 ? "New Developer" : "Edit";
     },
     calcMarginPerH() {
-      return this.calcMargin / this.editedItem.time;
+      return this.calcMargin / this.timeCalc;
     },
     calcDevPayout() {
-      return this.editedItem.devRate * this.editedItem.time;
+      return this.editedItem.devRate * this.timeCalc;
     },
     calcMargin() {
       if (this.editedItem.isEmpFixedPayment) {
         return (
-          ((this.editedItem.companyRate * this.editedItem.time) / 100) *
+          ((this.editedItem.companyRate * this.timeCalc) / 100) *
             (100 - this.editedItem.fee) -
           this.editedItem.devPayout
         );
       } else
         return (
-          ((this.editedItem.companyRate * this.editedItem.time) / 100) *
+          ((this.editedItem.companyRate * this.timeCalc) / 100) *
             (100 - this.editedItem.fee) -
-          this.editedItem.devRate * this.editedItem.time
+          this.editedItem.devRate * this.timeCalc
         );
     },
     calcCustomerPaid() {
-      return this.editedItem.companyRate * this.editedItem.time;
+      return this.editedItem.companyRate * this.timeCalc;
     }
   },
 
   watch: {
     project() {
-      this.devs = this.project.devs;
+      this.currentPeriod = this.project.currentPeriod;
+      this.page = this.currentPeriod + 1;
+      this.devs = this.project.periods[this.project.currentPeriod].devs;
+
       this.name = this.project.name;
     },
     dialog(val) {
@@ -241,6 +281,7 @@ export default {
       const index = this.devs.indexOf(item);
       confirm("Are you sure you want to delete this item?") &&
         this.devs.splice(index, 1);
+      this.editProject(this.devs, this.project.name);
     },
 
     close() {
@@ -257,6 +298,7 @@ export default {
       if (!this.editedItem.isEmpFixedPayment) {
         edited.devPayout = this.calcDevPayout.toFixed(2);
       }
+      edited.time = `${edited.hours}:${edited.minutes}`;
 
       edited.margin = this.calcMargin.toFixed(2);
       if (this.editedItem.isEmpFixedPayment) {
@@ -277,5 +319,17 @@ export default {
 .headOfEdit {
   display: flex;
   justify-content: space-between;
+}
+.time {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 5px;
+}
+
+.paggination {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 </style>

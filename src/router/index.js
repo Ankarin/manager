@@ -1,14 +1,15 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import ProjectSpace from "../components/ProjectSpace.vue";
+// import ProjectSpace from "../components/ProjectSpace.vue";
+import AppView from "../components/AppView.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "ProjectSpace",
-    component: ProjectSpace
+    name: "AppView",
+    component: AppView
   }
 ];
 
