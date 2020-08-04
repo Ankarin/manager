@@ -20,7 +20,11 @@
             hide-details
           ></v-checkbox>
         </v-card-text>
-        {{ selected }}
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+          <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -38,7 +42,7 @@ export default {
   },
   methods: {
     save() {
-      let devs = this.newDevs.filter(item => this.newDevs.includes(item.name));
+      let devs = this.devs.filter(item => this.selected.includes(item.name));
       this.addPeriod(devs);
       this.dialog = false;
     },
@@ -53,6 +57,7 @@ export default {
     }
   },
   mounted() {
+    console.log(this.devs);
     this.newDevs = this.devs;
     this.selected = this.devs.map(item => (item = item.name));
   }

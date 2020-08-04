@@ -26,6 +26,11 @@
         <v-card-text>
           <!-- <v-row> -->
           <!-- <v-col cols="12" sm="6" md="4"> -->
+          {{ type }}
+          <v-radio-group v-model="typeOfProject" :mandatory="true">
+            <v-radio label="Hourly paid" value="hourly"></v-radio>
+            <v-radio label="Fixed price" value="fixed"></v-radio>
+          </v-radio-group>
           <v-text-field
             v-model="project.name"
             :rules="[rules.required, rules.counter, rules.exist]"
@@ -57,6 +62,7 @@ export default {
   data() {
     return {
       dialog: false,
+      typeOfProject: "hourly",
       project: {
         name: ""
       },
@@ -90,7 +96,7 @@ export default {
       else return false;
     },
     save: async function() {
-      const res = await this.createProject(this.project);
+      const res = await this.createProject(this.project, this.typeOfProject);
       if (res == "ok") {
         this.dialog = false;
         this.project.name = "";

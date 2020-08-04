@@ -25,6 +25,7 @@
     <v-main>
       <v-container class="fill-height" fluid>
         <ProjectSpace
+          :changeCurPeriod="changeCurPeriod"
           :editProject="editProject"
           :createProject="createProject"
           class="projectSpace"
@@ -32,6 +33,7 @@
           :projects="projects"
           :project="project"
           :user="user"
+          :newPeriod="newPeriod"
         />
       </v-container>
     </v-main>
@@ -72,6 +74,26 @@ export default {
   },
 
   methods: {
+    changeCurPeriod(period, name) {
+      let indexOfProject = this.projects.findIndex(
+        element => element.name == name
+      );
+      this.projects[indexOfProject].currentPeriod = period;
+      // this.editProject(devs, name);
+    },
+    newPeriod(devs, name) {
+      let indexOfProject = this.projects.findIndex(
+        element => element.name == name
+      );
+      this.projects[indexOfProject].periods.push({ devs: devs });
+      this.projects[indexOfProject].currentPeriod =
+        this.projects[indexOfProject].periods.length - 1;
+      db.collection("users")
+        .doc(this.user.email)
+        .update({
+          projects: this.projects
+        });
+    },
     deleteProject(index) {
       this.projects.splice(index, 1);
       db.collection("users")
@@ -98,7 +120,7 @@ export default {
         console.log("Error getting document:", error);
       }
     },
-    createProject: async function(project) {
+    createProject: async function(project, type) {
       const isExist = this.projects.filter(item => item.name == project.name)
         .length;
       if (isExist > 0) {
@@ -106,8 +128,8 @@ export default {
       } else {
         let newProject = {
           name: project.name,
-          devs: [],
           currentPeriod: 0,
+          type: type,
           periods: [{ devs: [] }]
         };
         this.projects.push(newProject);

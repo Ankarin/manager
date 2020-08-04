@@ -3,10 +3,10 @@
     <div class="paggination" v-if="project.name">
       <v-pagination
         v-model="page"
-        :length="20"
+        :length="periodsLength"
         :total-visible="10"
       ></v-pagination>
-      <AddPeriod :devs="devs" />
+      <AddPeriod :devs="devs" :addPeriod="addPeriod" />
     </div>
     <v-data-table
       hide-default-footer
@@ -128,6 +128,7 @@
           mdi-delete
         </v-icon>
       </template>
+
       <template v-if="!project">
         <br />
         <CreateProject
@@ -156,7 +157,9 @@ export default {
     "user",
     "createProject",
     "projects",
-    "editProject"
+    "editProject",
+    "changeCurPeriod",
+    "newPeriod"
   ],
   data: () => ({
     currentPeriod: 0,
@@ -209,6 +212,9 @@ export default {
   }),
 
   computed: {
+    kek() {
+      return false;
+    },
     periodsLength() {
       return this.project.periods.length;
     },
@@ -261,6 +267,13 @@ export default {
     },
     dialog(val) {
       val || this.close();
+    },
+    currentPeriod() {
+      this.changeCurPeriod(this.currentPeriod, this.project.name);
+      this.devs = this.project.periods[this.project.currentPeriod].devs;
+    },
+    page() {
+      this.currentPeriod = this.page - 1;
     }
   },
 
@@ -269,6 +282,10 @@ export default {
   },
 
   methods: {
+    addPeriod(devs) {
+      this.newPeriod(devs, this.project.name);
+      this.page = this.periodsLength;
+    },
     initialize() {},
 
     editItem(item) {
